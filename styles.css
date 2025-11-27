@@ -104,6 +104,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  min-height: 42px;
   line-height: 1.1;
   transition: transform var(--duracion-transicion), border-color var(--duracion-transicion), background var(--duracion-transicion);
   font-weight: 600;
@@ -135,7 +136,9 @@ body {
 }
 
 .etiqueta-cargar {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .zona-pestanas {
