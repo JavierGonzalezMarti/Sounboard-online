@@ -9,6 +9,7 @@ import {
   calcularBorde,
   clonarEstado,
   crearEstadoInicial,
+  eliminarPad,
   eliminarPestana,
   establecerPestanaActiva,
   formatearTiempo,
@@ -29,6 +30,7 @@ import {
 } from "./almacenamiento.js";
 import {
   ajustarVolumenPad,
+  desmontarAudioPad,
   detenerAudio,
   obtenerAudioElemento,
   obtenerEstadoAudio,
@@ -55,6 +57,7 @@ const intervaloTemporizadorMs = 250;
 const volumenDucking = 0.35;
 const saltoScrollPestanas = 150;
 const umbralFinReproduccion = 0.12;
+let padContextualActivo = null;
 
 const limpiarExtensionNombre = (nombre) => {
   if (!nombre) return "";
@@ -92,6 +95,19 @@ const aplicarColoresPad = (elemento, pad) => {
   elemento.style.setProperty("--pad-text-muted-on", textoSuave);
   elemento.style.setProperty("--pad-text-color-off", "#f7f7fb");
   elemento.style.setProperty("--pad-text-muted-off", "rgba(247, 247, 251, 0.78)");
+};
+
+const ocultarContextoPad = () => {
+  if (padContextualActivo) {
+    padContextualActivo.classList.remove("contexto-pad-visible");
+    padContextualActivo = null;
+  }
+};
+
+const mostrarContextoPad = (contenedor) => {
+  ocultarContextoPad();
+  contenedor.classList.add("contexto-pad-visible");
+  padContextualActivo = contenedor;
 };
 
 const calcularAnguloRestante = (tiempoRestante, duracionTotal) => {
@@ -169,6 +185,18 @@ const obtenerIdPestanaDePad = (idPad) => {
     p.pads.some((pad) => pad.idPad === idPad)
   );
   return pestana?.idPestana ?? estadoAplicacion.pestanaActivaId;
+};
+
+const eliminarPadDeEstado = async (idPad) => {
+  const idPestana = obtenerIdPestanaDePad(idPad);
+  const pad = obtenerPadPorId(idPad);
+  if (!pad) return;
+  detenerTemporizadorPad(idPad);
+  await detenerAudio(idPad, { reinicioActivo: true, fadeOutActivo: false });
+  desmontarAudioPad(idPad);
+  await eliminarAudioDeIndexedDB(idPad);
+  estadoAplicacion = eliminarPad(estadoAplicacion, idPestana, idPad);
+  guardarYRenderizar();
 };
 
 const guardarYRenderizar = () => {
@@ -275,6 +303,17 @@ const crearPadElemento = (pad) => {
   aplicarColoresPad(contenedor, pad);
   contenedor.classList.toggle("reproduciendo", pad.reproduccion.reproduciendo);
 
+  const botonEliminarPad = document.createElement("button");
+  botonEliminarPad.type = "button";
+  botonEliminarPad.className = "boton-eliminar-pad";
+  botonEliminarPad.textContent = "Eliminar pad";
+  botonEliminarPad.addEventListener("click", (evento) => {
+    evento.stopPropagation();
+    ocultarContextoPad();
+    eliminarPadDeEstado(pad.idPad);
+  });
+  contenedor.appendChild(botonEliminarPad);
+
   const selectorColores = document.createElement("div");
   selectorColores.className = "selector-colores";
   contenedor.appendChild(selectorColores);
@@ -358,13 +397,27 @@ const crearPadElemento = (pad) => {
   const indicadorOnda = document.createElement("div");
   indicadorOnda.className = "indicador-onda";
   indicadorOnda.innerHTML = "<span></span><span></span><span></span>";
+
+  const relojCircular = document.createElement("span");
+  relojCircular.className = "reloj-circular";
+  aplicarProgresoCircular(
+    relojCircular,
+    pad.reproduccion.tiempoRestante || 0,
+    pad.reproduccion.duracionTotal || 0
+  );
+
   const contenedorRestante = document.createElement("div");
   contenedorRestante.className = "tiempo-restante-contenedor";
-  contenedorRestante.append(indicadorOnda, tiempoRestante);
-  tiempos.append(tiempoTotal, contenedorRestante);
+  contenedorRestante.append(relojCircular, tiempoRestante);
+
+  tiempos.append(tiempoTotal, indicadorOnda, contenedorRestante);
   contenedor.appendChild(tiempos);
 
   contenedor.addEventListener("click", () => manejarClickPad(pad.idPad));
+  contenedor.addEventListener("contextmenu", (evento) => {
+    evento.preventDefault();
+    mostrarContextoPad(contenedor);
+  });
   contenedor.addEventListener("dragover", (evento) => {
     evento.preventDefault();
     contenedor.classList.add("dropzone-activa");
@@ -484,9 +537,12 @@ const actualizarTiempoEnUI = (idPad, tiempoRestante, duracionTotal) => {
   if (!contenedor) return;
   const etiquetaRestante = contenedor.querySelector(".tiempo-restante");
   const etiquetaTotal = contenedor.querySelector(".tiempo-total");
+  const relojCircular = contenedor.querySelector(".reloj-circular");
   if (etiquetaRestante) {
     etiquetaRestante.textContent = `-${formatearTiempo(tiempoRestante)}`;
-    aplicarProgresoCircular(etiquetaRestante, tiempoRestante, duracionTotal);
+  }
+  if (relojCircular) {
+    aplicarProgresoCircular(relojCircular, tiempoRestante, duracionTotal);
   }
   if (etiquetaTotal && Number.isFinite(duracionTotal)) {
     etiquetaTotal.textContent = formatearTiempo(duracionTotal);
@@ -754,6 +810,15 @@ const configurarEventos = () => {
   });
   flechaDerecha.addEventListener("click", () => {
     contenedorPestanas.scrollBy({ left: saltoScrollPestanas, behavior: "smooth" });
+  });
+
+  document.addEventListener("click", ocultarContextoPad);
+  document.addEventListener("contextmenu", (evento) => {
+    const pad = evento.target.closest(".pad[data-pad-id]");
+    if (!pad) {
+      evento.preventDefault();
+      ocultarContextoPad();
+    }
   });
 };
 

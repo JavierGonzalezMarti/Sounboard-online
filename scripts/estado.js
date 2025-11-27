@@ -198,6 +198,14 @@ const establecerPestanaActiva = (estado, idPestana) => {
   return { ...estado, pestanaActivaId: idPestana };
 };
 
+const eliminarPad = (estado, idPestana, idPad) => {
+  const pestanasActualizadas = estado.pestañas.map((p) => {
+    if (p.idPestana !== idPestana) return p;
+    return { ...p, pads: p.pads.filter((pad) => pad.idPad !== idPad) };
+  });
+  return { ...estado, pestañas: pestanasActualizadas };
+};
+
 const agregarPestana = (estado, nombre = "Nueva pestaña") => {
   const padInicial = crearPadBase(estado.indiceColor);
   const nuevaPestana = {
@@ -247,6 +255,7 @@ export {
   crearPadBase,
   duracionFadePorDefecto,
   eliminarPestana,
+  eliminarPad,
   establecerPestanaActiva,
   formatearTiempo,
   paletaColores,
