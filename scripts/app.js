@@ -670,7 +670,7 @@ const configurarEventos = () => {
     try {
       const estado = await leerArchivoConfiguracion(archivo);
       await limpiarAudios();
-      estadoAplicacion = estado;
+      estadoAplicacion = limpiarExtensionesEstado(estado);
       asegurarEstadoValido();
       await restaurarAudios();
       actualizarColumnasUI(estadoAplicacion.columnas);

@@ -389,6 +389,7 @@ body {
   border-radius: 999px;
   animation: onda 1s ease-in-out infinite;
   box-shadow: 0 0 12px rgb(var(--pad-color-rgb) / 0.7);
+  transform-origin: center bottom;
 }
 
 .indicador-onda span:nth-child(2) {
