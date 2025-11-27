@@ -209,6 +209,7 @@ const renderizarPestanas = () => {
         return;
       }
       estadoAplicacion = establecerPestanaActiva(estadoAplicacion, pestana.idPestana);
+      renderizarPestanas();
       renderizarPads();
       guardarEstadoLocal(estadoAplicacion);
     });
