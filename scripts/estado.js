@@ -97,16 +97,21 @@ const crearPadBase = (indiceColor = 0) => {
 };
 
 const crearEstadoInicial = (numeroPestanas = 3, columnas = 5) => {
-  const pestañas = Array.from({ length: numeroPestanas }).map((_, indice) => ({
-    idPestana: crearIdUnico(),
-    nombre: `Pestaña ${indice + 1}`,
-    pads: []
-  }));
+  let indiceColor = 0;
+  const pestañas = Array.from({ length: numeroPestanas }).map((_, indice) => {
+    const padInicial = crearPadBase(indiceColor);
+    indiceColor += 1;
+    return {
+      idPestana: crearIdUnico(),
+      nombre: `Pestaña ${indice + 1}`,
+      pads: [padInicial]
+    };
+  });
   return {
     pestañas,
     pestanaActivaId: pestañas[0].idPestana,
     columnas,
-    indiceColor: 0
+    indiceColor
   };
 };
 
@@ -193,15 +198,17 @@ const establecerPestanaActiva = (estado, idPestana) => {
 };
 
 const agregarPestana = (estado, nombre = "Nueva pestaña") => {
+  const padInicial = crearPadBase(estado.indiceColor);
   const nuevaPestana = {
     idPestana: crearIdUnico(),
     nombre,
-    pads: []
+    pads: [padInicial]
   };
   return {
     ...estado,
     pestañas: [...estado.pestañas, nuevaPestana],
-    pestanaActivaId: nuevaPestana.idPestana
+    pestanaActivaId: nuevaPestana.idPestana,
+    indiceColor: estado.indiceColor + 1
   };
 };
 

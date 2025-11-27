@@ -105,6 +105,7 @@ body {
   justify-content: center;
   gap: 6px;
   min-height: 42px;
+  font-size: 14px;
   line-height: 1.1;
   transition: transform var(--duracion-transicion), border-color var(--duracion-transicion), background var(--duracion-transicion);
   font-weight: 600;

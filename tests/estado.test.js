@@ -14,13 +14,17 @@ test("crearEstadoInicial genera tres pestañas y columnas por defecto", () => {
   assert.equal(estado.pestañas.length, 3);
   assert.equal(estado.columnas, 5);
   assert.ok(estado.pestanaActivaId);
+  estado.pestañas.forEach((p) => {
+    assert.ok(p.pads.length >= 1, "Cada pestaña debe iniciar con al menos un pad");
+  });
 });
 
 test("agregarPad suma un pad en la pestaña activa", () => {
   let estado = crearEstadoInicial(1);
   const idPestana = estado.pestanaActivaId;
+  const cantidadAntes = estado.pestañas[0].pads.length;
   estado = agregarPad(estado, idPestana);
-  assert.equal(estado.pestañas[0].pads.length, 1);
+  assert.equal(estado.pestañas[0].pads.length, cantidadAntes + 1);
 });
 
 test("actualizarPad modifica propiedades manteniendo el resto", () => {

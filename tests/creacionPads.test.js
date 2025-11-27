@@ -6,13 +6,18 @@ test("se pueden crear múltiples pads vacíos consecutivos", () => {
   let estado = crearEstadoInicial(1);
   const idPestana = estado.pestanaActivaId;
   const cantidad = 5;
+  const padsIniciales = estado.pestañas.find((p) => p.idPestana === idPestana).pads.length;
   for (let i = 0; i < cantidad; i += 1) {
     estado = agregarPad(estado, idPestana);
   }
   const pads = estado.pestañas.find((p) => p.idPestana === idPestana).pads;
-  assert.equal(pads.length, cantidad, "Debe haberse creado un pad por cada click simulado");
+  assert.equal(
+    pads.length,
+    cantidad + padsIniciales,
+    "Debe haberse creado un pad por cada click simulado"
+  );
   const idsUnicos = new Set(pads.map((p) => p.idPad));
-  assert.equal(idsUnicos.size, cantidad, "Cada pad debe tener un id único");
+  assert.equal(idsUnicos.size, cantidad + padsIniciales, "Cada pad debe tener un id único");
   pads.forEach((pad) => {
     assert.equal(pad.nombreArchivo, "Vacío");
     assert.equal(pad.archivo, null);
