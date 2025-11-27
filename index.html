@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SoundBoard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="aplicacion">
+      <header class="encabezado">
+        <div class="marca">
+          <div class="marca-icono">🎛️</div>
+          <div>
+            <p class="marca-titulo">SoundBoard</p>
+            <p class="marca-subtitulo">Pads rápidos con memoria local</p>
+          </div>
+        </div>
+        <div class="controles-principales">
+          <div class="control-columnas">
+            <label for="selectorColumnas">Columnas</label>
+            <input
+              id="selectorColumnas"
+              type="range"
+              min="1"
+              max="10"
+              step="1"
+              value="5"
+            />
+            <span id="valorColumnas" class="valor-columnas">5</span>
+          </div>
+          <div class="botonera-acciones">
+            <button id="botonGuardar" class="boton secundario">Guardar</button>
+            <label for="cargadorArchivo" class="boton secundario etiqueta-cargar"
+              >Cargar</label
+            >
+            <input
+              id="cargadorArchivo"
+              type="file"
+              accept="application/json"
+              hidden
+            />
+            <button id="botonReiniciar" class="boton fantasma">
+              Nuevo proyecto
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="zona-pestanas">
+        <button id="flechaIzquierda" class="navegacion-pestanas">‹</button>
+        <div id="contenedorPestanas" class="pestanas"></div>
+        <button id="flechaDerecha" class="navegacion-pestanas">›</button>
+        <button id="botonAgregarPestana" class="boton primario">
+          + Añadir pestaña
+        </button>
+      </section>
+
+      <section class="ayudas">
+        <p>
+          Arrastra un audio a cualquier pad o toca el pad vacío para elegir
+          archivo. Cada icono actúa como alternador: ducking 🦆, bucle ↻,
+          reinicio ↩︎, color 🎨, fade in ⤴︎, fade out ⤵︎.
+        </p>
+      </section>
+
+      <main>
+        <div id="gridPads" class="grid-pads"></div>
+      </main>
+    </div>
+
+    <input id="entradaArchivoOculta" type="file" accept="audio/*" hidden />
+
+    <script type="module" src="scripts/app.js"></script>
+  </body>
+</html>

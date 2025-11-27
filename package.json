@@ -1,0 +1,9 @@
+{
+  "name": "soundboard-web",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Soundboard web en español con persistencia y pruebas básicas",
+  "scripts": {
+    "test": "node --test"
+  }
+}
