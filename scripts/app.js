@@ -110,17 +110,6 @@ const mostrarContextoPad = (contenedor) => {
   padContextualActivo = contenedor;
 };
 
-const calcularAnguloRestante = (tiempoRestante, duracionTotal) => {
-  if (!duracionTotal || !Number.isFinite(duracionTotal)) return "0deg";
-  const restante = Math.max(0, Math.min(1, tiempoRestante / duracionTotal));
-  return `${restante * 360}deg`;
-};
-
-const aplicarProgresoCircular = (elemento, tiempoRestante, duracionTotal) => {
-  if (!elemento) return;
-  elemento.style.setProperty("--angulo-restante", calcularAnguloRestante(tiempoRestante, duracionTotal));
-};
-
 const limpiarExtensionesEstado = (estado) => ({
   ...estado,
   pestañas: estado.pestañas.map((pestana) => ({
@@ -398,19 +387,7 @@ const crearPadElemento = (pad) => {
   indicadorOnda.className = "indicador-onda";
   indicadorOnda.innerHTML = "<span></span><span></span><span></span>";
 
-  const relojCircular = document.createElement("span");
-  relojCircular.className = "reloj-circular";
-  aplicarProgresoCircular(
-    relojCircular,
-    pad.reproduccion.tiempoRestante || 0,
-    pad.reproduccion.duracionTotal || 0
-  );
-
-  const contenedorRestante = document.createElement("div");
-  contenedorRestante.className = "tiempo-restante-contenedor";
-  contenedorRestante.append(relojCircular, tiempoRestante);
-
-  tiempos.append(tiempoTotal, indicadorOnda, contenedorRestante);
+  tiempos.append(tiempoTotal, indicadorOnda, tiempoRestante);
   contenedor.appendChild(tiempos);
 
   contenedor.addEventListener("click", () => manejarClickPad(pad.idPad));
@@ -537,12 +514,8 @@ const actualizarTiempoEnUI = (idPad, tiempoRestante, duracionTotal) => {
   if (!contenedor) return;
   const etiquetaRestante = contenedor.querySelector(".tiempo-restante");
   const etiquetaTotal = contenedor.querySelector(".tiempo-total");
-  const relojCircular = contenedor.querySelector(".reloj-circular");
   if (etiquetaRestante) {
     etiquetaRestante.textContent = `-${formatearTiempo(tiempoRestante)}`;
-  }
-  if (relojCircular) {
-    aplicarProgresoCircular(relojCircular, tiempoRestante, duracionTotal);
   }
   if (etiquetaTotal && Number.isFinite(duracionTotal)) {
     etiquetaTotal.textContent = formatearTiempo(duracionTotal);
