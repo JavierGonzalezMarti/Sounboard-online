@@ -88,8 +88,10 @@ const aplicarColoresPad = (elemento, pad) => {
   elemento.style.setProperty("--pad-color-rgb", `${r} ${g} ${b}`);
   elemento.style.setProperty("--pad-color-base", pad.colorBase);
   elemento.style.setProperty("--pad-color-borde", pad.colorBorde);
-  elemento.style.setProperty("--pad-text-color", textoPrincipal);
-  elemento.style.setProperty("--pad-text-muted", textoSuave);
+  elemento.style.setProperty("--pad-text-color-on", textoPrincipal);
+  elemento.style.setProperty("--pad-text-muted-on", textoSuave);
+  elemento.style.setProperty("--pad-text-color-off", "#f7f7fb");
+  elemento.style.setProperty("--pad-text-muted-off", "rgba(247, 247, 251, 0.78)");
 };
 
 const limpiarExtensionesEstado = (estado) => ({

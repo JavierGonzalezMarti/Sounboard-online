@@ -100,6 +100,11 @@ body {
   padding: 10px 14px;
   border-radius: 10px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  line-height: 1.1;
   transition: transform var(--duracion-transicion), border-color var(--duracion-transicion), background var(--duracion-transicion);
   font-weight: 600;
 }
@@ -215,8 +220,12 @@ body {
   --pad-color-base: var(--relleno-pad);
   --pad-color-rgb: 34 38 58;
   --pad-color-borde: #6cf0c2;
-  --pad-text-color: #f7f7fb;
-  --pad-text-muted: rgba(247, 247, 251, 0.78);
+  --pad-text-color-off: #f7f7fb;
+  --pad-text-muted-off: rgba(247, 247, 251, 0.78);
+  --pad-text-color-on: #f7f7fb;
+  --pad-text-muted-on: rgba(247, 247, 251, 0.78);
+  --pad-text-color: var(--pad-text-color-off);
+  --pad-text-muted: var(--pad-text-muted-off);
   position: relative;
   overflow: hidden;
   background:
@@ -282,6 +291,8 @@ body {
     0 16px 40px rgb(var(--pad-color-rgb) / 0.38),
     0 12px 30px rgba(0, 0, 0, 0.5);
   filter: saturate(1) brightness(1.05);
+  --pad-text-color: var(--pad-text-color-on);
+  --pad-text-muted: var(--pad-text-muted-on);
 }
 
 .pad.reproduciendo::before {
@@ -365,6 +376,20 @@ body {
   gap: 10px;
 }
 
+.pad-tiempos span {
+  display: inline-block;
+  min-width: 64px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pad-tiempos .tiempo-total {
+  text-align: left;
+}
+
+.pad-tiempos .tiempo-restante {
+  text-align: right;
+}
+
 .pad.reproduciendo .pad-tiempos {
   color: var(--pad-text-color);
 }
@@ -388,8 +413,8 @@ body {
 }
 
 .indicador-onda span {
-  width: 5px;
-  height: 10px;
+  width: 6px;
+  height: 12px;
   background: rgb(var(--pad-color-rgb) / 0.75);
   border-radius: 999px;
   animation: onda 1s ease-in-out infinite;
