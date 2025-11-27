@@ -418,13 +418,14 @@ body {
 }
 
 .pad-tiempos {
-  display: grid;
-  grid-template-columns: 74px 34px 74px;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   font-weight: 600;
   color: var(--pad-text-color);
   gap: 10px;
   width: 100%;
+  margin-top: auto;
 }
 
 .pad-tiempos span {
@@ -440,7 +441,7 @@ body {
 
 .pad-tiempos .tiempo-restante {
   text-align: right;
-  justify-self: end;
+  margin-left: auto;
 }
 
 .pad.reproduciendo .pad-tiempos {
@@ -457,7 +458,7 @@ body {
   height: 26px;
   border-radius: 999px;
   position: relative;
-  justify-self: center;
+  margin: 0 auto;
   background: conic-gradient(
     var(--pad-color-borde) 0deg var(--angulo-restante, 360deg),
     rgba(255, 255, 255, 0.08) var(--angulo-restante, 360deg) 360deg
