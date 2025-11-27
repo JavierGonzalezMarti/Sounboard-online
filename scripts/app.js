@@ -76,6 +76,17 @@ const hexAComponentesRgb = (colorHex) => {
   return { r, g, b };
 };
 
+const calcularAnguloRestante = (tiempoRestante, duracionTotal) => {
+  if (!duracionTotal || !Number.isFinite(duracionTotal)) return "360deg";
+  const restante = Math.max(0, Math.min(1, tiempoRestante / duracionTotal));
+  return `${restante * 360}deg`;
+};
+
+const aplicarProgresoCircular = (elemento, tiempoRestante, duracionTotal) => {
+  if (!elemento) return;
+  elemento.style.setProperty("--angulo-restante", calcularAnguloRestante(tiempoRestante, duracionTotal));
+};
+
 const colorTextoContraste = (colorHex) => {
   const { r, g, b } = hexAComponentesRgb(colorHex);
   const brillo = 0.299 * r + 0.587 * g + 0.114 * b;
@@ -292,6 +303,11 @@ const crearPadElemento = (pad) => {
   aplicarColoresPad(contenedor, pad);
   contenedor.classList.toggle("reproduciendo", pad.reproduccion.reproduciendo);
 
+  const ondaFondo = document.createElement("div");
+  ondaFondo.className = "onda-fondo";
+  ondaFondo.innerHTML = "<span></span><span></span><span></span>";
+  contenedor.appendChild(ondaFondo);
+
   const botonEliminarPad = document.createElement("button");
   botonEliminarPad.type = "button";
   botonEliminarPad.className = "boton-eliminar-pad";
@@ -378,16 +394,15 @@ const crearPadElemento = (pad) => {
     ? `-${formatearTiempo(pad.reproduccion.tiempoRestante)}`
     : "-00:00";
   tiempoRestante.textContent = textoRestante;
+  const indicadorCircular = document.createElement("span");
+  indicadorCircular.className = "reloj-circular";
   aplicarProgresoCircular(
-    tiempoRestante,
+    indicadorCircular,
     pad.reproduccion.tiempoRestante || 0,
     pad.reproduccion.duracionTotal || 0
   );
-  const indicadorOnda = document.createElement("div");
-  indicadorOnda.className = "indicador-onda";
-  indicadorOnda.innerHTML = "<span></span><span></span><span></span>";
 
-  tiempos.append(tiempoTotal, indicadorOnda, tiempoRestante);
+  tiempos.append(tiempoTotal, indicadorCircular, tiempoRestante);
   contenedor.appendChild(tiempos);
 
   contenedor.addEventListener("click", () => manejarClickPad(pad.idPad));
@@ -514,8 +529,12 @@ const actualizarTiempoEnUI = (idPad, tiempoRestante, duracionTotal) => {
   if (!contenedor) return;
   const etiquetaRestante = contenedor.querySelector(".tiempo-restante");
   const etiquetaTotal = contenedor.querySelector(".tiempo-total");
+  const indicadorCircular = contenedor.querySelector(".reloj-circular");
   if (etiquetaRestante) {
     etiquetaRestante.textContent = `-${formatearTiempo(tiempoRestante)}`;
+  }
+  if (indicadorCircular) {
+    aplicarProgresoCircular(indicadorCircular, tiempoRestante, duracionTotal);
   }
   if (etiquetaTotal && Number.isFinite(duracionTotal)) {
     etiquetaTotal.textContent = formatearTiempo(duracionTotal);

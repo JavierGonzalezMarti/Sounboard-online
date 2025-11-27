@@ -419,7 +419,7 @@ body {
 
 .pad-tiempos {
   display: grid;
-  grid-template-columns: 74px 1fr 74px;
+  grid-template-columns: 74px 34px 74px;
   align-items: center;
   font-weight: 600;
   color: var(--pad-text-color);
@@ -451,42 +451,59 @@ body {
   font-weight: 500;
 }
 
-.indicador-onda {
-  display: none;
-  gap: 5px;
-  align-items: center;
-  height: 16px;
-  pointer-events: none;
-  justify-self: center;
-}
-
-.pad.reproduciendo .indicador-onda {
-  display: inline-flex;
-}
-
-.indicador-onda span {
-  width: 5px;
-  height: 10px;
-  background: rgb(var(--pad-color-rgb) / 0.75);
+.reloj-circular {
+  width: 26px;
+  height: 26px;
   border-radius: 999px;
-  animation: onda 1s ease-in-out infinite;
-  box-shadow: 0 0 12px rgb(var(--pad-color-rgb) / 0.7);
-  transform-origin: center bottom;
+  position: relative;
+  justify-self: center;
+  background: conic-gradient(
+    var(--pad-color-borde) 0deg var(--angulo-restante, 360deg),
+    rgba(255, 255, 255, 0.08) var(--angulo-restante, 360deg) 360deg
+  );
+  box-shadow:
+    inset 0 0 8px rgba(0, 0, 0, 0.35),
+    0 0 10px rgb(var(--pad-color-rgb) / 0.35);
+  pointer-events: none;
 }
 
-.indicador-onda span:nth-child(2) {
-  animation-delay: 0.15s;
-  height: 14px;
+.reloj-circular::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.45), transparent 60%);
 }
 
-.indicador-onda span:nth-child(3) {
-  animation-delay: 0.3s;
-  height: 11px;
+.onda-fondo {
+  position: absolute;
+  inset: -8px;
+  border-radius: 20px;
+  overflow: hidden;
+  display: none;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.35;
 }
 
-.pad.reproduciendo .indicador-onda span {
-  background: var(--pad-color-borde);
-  box-shadow: 0 0 14px var(--pad-color-borde);
+.onda-fondo span {
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(circle, rgb(var(--pad-color-rgb) / 0.35), transparent 60%);
+  filter: blur(12px);
+  animation: onda-fondo 2.6s ease-in-out infinite;
+}
+
+.onda-fondo span:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.onda-fondo span:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+.pad.reproduciendo .onda-fondo {
+  display: block;
 }
 
 @keyframes onda {
@@ -498,6 +515,21 @@ body {
   50% {
     transform: scaleY(1.35);
     opacity: 1;
+  }
+}
+
+@keyframes onda-fondo {
+  0% {
+    transform: scale(0.95) rotate(0deg);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.08) rotate(12deg);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(0.95) rotate(24deg);
+    opacity: 0.2;
   }
 }
 
