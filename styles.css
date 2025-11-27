@@ -253,7 +253,6 @@ body {
 }
 
 .pad > * {
-  position: relative;
   z-index: 1;
 }
 
@@ -370,12 +369,13 @@ body {
 .indicador-onda {
   position: absolute;
   top: 12px;
-  right: 12px;
+  left: 12px;
   display: none;
   gap: 6px;
   align-items: flex-end;
   height: 22px;
   pointer-events: none;
+  z-index: 1;
 }
 
 .pad.reproduciendo .indicador-onda {
@@ -464,6 +464,10 @@ body {
   font-size: 18px;
   gap: 10px;
   box-shadow: 0 12px 24px rgba(124, 58, 237, 0.28);
+}
+
+.pad.placeholder-vacio {
+  filter: none;
 }
 
 .placeholder-vacio .pad-nombre {
