@@ -12,6 +12,7 @@ import {
   eliminarPestana,
   establecerPestanaActiva,
   formatearTiempo,
+  normalizarEstado,
   paletaColores,
   renombrarPestana
 } from "./estado.js";
@@ -46,7 +47,7 @@ const entradaArchivoOculta = document.getElementById("entradaArchivoOculta");
 const flechaIzquierda = document.getElementById("flechaIzquierda");
 const flechaDerecha = document.getElementById("flechaDerecha");
 
-let estadoAplicacion = cargarEstadoLocal() || crearEstadoInicial();
+let estadoAplicacion = normalizarEstado(cargarEstadoLocal() || crearEstadoInicial());
 let padEsperandoArchivo = null;
 const temporizadores = new Map();
 const intervaloTemporizadorMs = 250;
@@ -89,6 +90,16 @@ const obtenerPestanaActiva = () =>
   estadoAplicacion.pestañas.find(
     (pestana) => pestana.idPestana === estadoAplicacion.pestanaActivaId
   );
+
+const obtenerPestanaActivaGarantizada = () => {
+  let pestana = obtenerPestanaActiva();
+  if (!pestana) {
+    estadoAplicacion = normalizarEstado(crearEstadoInicial());
+    pestana = obtenerPestanaActiva();
+    guardarEstadoLocal(estadoAplicacion);
+  }
+  return pestana;
+};
 
 const obtenerIdPestanaDePad = (idPad) => {
   const pestana = estadoAplicacion.pestañas.find((p) =>
@@ -306,8 +317,29 @@ const crearPadVacio = () => {
   contenedor.innerHTML =
     "<div class='pad-nombre'><span aria-hidden='true'>＋</span> Añadir pad</div>";
   contenedor.addEventListener("click", () => {
-    const pestana = obtenerPestanaActiva();
+    const pestana = obtenerPestanaActivaGarantizada();
     estadoAplicacion = agregarPad(estadoAplicacion, pestana.idPestana);
+    guardarYRenderizar();
+  });
+  contenedor.addEventListener("dragover", (evento) => {
+    evento.preventDefault();
+    contenedor.classList.add("dropzone-activa");
+  });
+  contenedor.addEventListener("dragleave", () =>
+    contenedor.classList.remove("dropzone-activa")
+  );
+  contenedor.addEventListener("drop", (evento) => {
+    evento.preventDefault();
+    contenedor.classList.remove("dropzone-activa");
+    const archivo = evento.dataTransfer.files?.[0];
+    if (!archivo) return;
+    const pestana = obtenerPestanaActivaGarantizada();
+    estadoAplicacion = agregarPad(estadoAplicacion, pestana.idPestana);
+    const pestanaActualizada = obtenerPestanaActivaGarantizada();
+    const nuevoPad = pestanaActualizada.pads[pestanaActualizada.pads.length - 1];
+    if (nuevoPad) {
+      asignarArchivoAPad(nuevoPad.idPad, archivo);
+    }
     guardarYRenderizar();
   });
   return contenedor;
@@ -316,13 +348,22 @@ const crearPadVacio = () => {
 const renderizarPads = () => {
   gridPads.innerHTML = "";
   const pestana = obtenerPestanaActiva();
-  if (!pestana) return;
-  gridPads.classList.toggle("grid-sin-pads", pestana.pads.length === 0);
-  pestana.pads.forEach((pad) => {
+  if (!pestana) {
+    estadoAplicacion = crearEstadoInicial();
+    guardarEstadoLocal(estadoAplicacion);
+    return renderizarPads();
+  }
+  const listaPads = Array.isArray(pestana.pads) ? pestana.pads : [];
+  gridPads.classList.toggle("grid-sin-pads", listaPads.length === 0);
+  listaPads.forEach((pad) => {
     const elemento = crearPadElemento(pad);
     gridPads.appendChild(elemento);
   });
   gridPads.appendChild(crearPadVacio());
+  if (gridPads.childElementCount === 0) {
+    gridPads.classList.add("grid-sin-pads");
+    gridPads.appendChild(crearPadVacio());
+  }
 };
 
 // -------------------------
@@ -631,6 +672,11 @@ const configurarEventos = () => {
 
 const iniciar = async () => {
   asegurarEstadoValido();
+  const pestana = obtenerPestanaActivaGarantizada();
+  if (pestana.pads.length === 0) {
+    // Creamos un primer pad vacío automático para que siempre haya uno visible.
+    estadoAplicacion = agregarPad(estadoAplicacion, pestana.idPestana);
+  }
   actualizarColumnasUI(estadoAplicacion.columnas);
   renderizarPestanas();
   renderizarPads();

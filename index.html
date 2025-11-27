@@ -61,11 +61,21 @@
           Arrastra un audio a cualquier pad o toca el pad vacío para elegir
           archivo. Cada icono actúa como alternador: ducking 🦆, bucle ↻,
           reinicio ↩︎, color 🎨, fade in ⤴︎, fade out ⤵︎.
+          Si no ves el pad “＋ Añadir pad”, pulsa “Nuevo proyecto” para resetear
+          el estado guardado del navegador.
         </p>
       </section>
 
       <main>
-        <div id="gridPads" class="grid-pads"></div>
+        <div id="gridPads" class="grid-pads grid-sin-pads">
+          <!-- Placeholder visible incluso sin JS para asegurarnos de que se vea el botón "+" -->
+          <div class="pad placeholder-vacio" data-placeholder-inicial>
+            <div class="pad-nombre">
+              <span aria-hidden="true">＋</span>
+              Añadir pad
+            </div>
+          </div>
+        </div>
       </main>
     </div>
 

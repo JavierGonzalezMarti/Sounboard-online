@@ -203,10 +203,11 @@ body {
   display: grid;
   grid-template-columns: repeat(var(--numero-columnas), minmax(180px, 1fr));
   gap: 16px;
+  margin-top: 8px;
 }
 
 .grid-sin-pads {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   justify-items: center;
 }
 
@@ -325,9 +326,9 @@ body {
 }
 
 .placeholder-vacio {
-  border: 2px dashed rgba(255, 255, 255, 0.18);
-  color: #e2e8f0;
-  background: rgba(255, 255, 255, 0.04);
+  border: 2px dashed rgba(124, 58, 237, 0.8);
+  color: #f8fafc;
+  background: rgba(124, 58, 237, 0.14);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -335,10 +336,18 @@ body {
   letter-spacing: 0.3px;
   font-size: 18px;
   gap: 10px;
+  box-shadow: 0 12px 24px rgba(124, 58, 237, 0.28);
 }
 
 .placeholder-vacio .pad-nombre {
   font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.placeholder-vacio .pad-nombre span {
+  font-size: 28px;
 }
 
 .dropzone-activa {

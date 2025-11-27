@@ -127,15 +127,34 @@ const formatearTiempo = (segundos) => {
 const agregarPad = (estado, idPestana) => {
   const nuevaPestana = buscarPestana(estado, idPestana);
   if (!nuevaPestana) return estado;
+  const padsExistentes = Array.isArray(nuevaPestana.pads) ? nuevaPestana.pads : [];
   const nuevoIndiceColor = estado.indiceColor + 1;
   const pad = crearPadBase(estado.indiceColor);
   const pestanasActualizadas = estado.pestañas.map((p) =>
-    p.idPestana === idPestana ? { ...p, pads: [...p.pads, pad] } : p
+    p.idPestana === idPestana ? { ...p, pads: [...padsExistentes, pad] } : p
   );
   return {
     ...estado,
     pestañas: pestanasActualizadas,
     indiceColor: nuevoIndiceColor
+  };
+};
+
+const normalizarEstado = (estado) => {
+  if (!estado || !Array.isArray(estado.pestañas) || estado.pestañas.length === 0) {
+    return crearEstadoInicial();
+  }
+  const pestañas = estado.pestañas.map((p) => ({
+    ...p,
+    pads: Array.isArray(p.pads) ? p.pads : []
+  }));
+  const pestanaActivaValida = pestañas.find((p) => p.idPestana === estado.pestanaActivaId);
+  return {
+    ...estado,
+    pestañas,
+    pestanaActivaId: pestanaActivaValida ? estado.pestanaActivaId : pestañas[0].idPestana,
+    columnas: Number.isFinite(estado.columnas) ? estado.columnas : 5,
+    indiceColor: Number.isFinite(estado.indiceColor) ? estado.indiceColor : 0
   };
 };
 
@@ -223,5 +242,6 @@ export {
   establecerPestanaActiva,
   formatearTiempo,
   paletaColores,
+  normalizarEstado,
   renombrarPestana
 };
