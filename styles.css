@@ -368,18 +368,19 @@ body {
 }
 
 .pad-tiempos {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   font-weight: 600;
   color: var(--pad-text-color);
-  gap: 10px;
+  gap: 8px;
 }
 
 .pad-tiempos span {
   display: inline-block;
-  min-width: 64px;
+  width: 74px;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .pad-tiempos .tiempo-total {
@@ -403,7 +404,7 @@ body {
   display: none;
   gap: 6px;
   align-items: flex-end;
-  height: 18px;
+  height: 16px;
   pointer-events: none;
   padding: 0 4px;
 }
@@ -413,8 +414,8 @@ body {
 }
 
 .indicador-onda span {
-  width: 6px;
-  height: 12px;
+  width: 5px;
+  height: 10px;
   background: rgb(var(--pad-color-rgb) / 0.75);
   border-radius: 999px;
   animation: onda 1s ease-in-out infinite;
