@@ -414,6 +414,22 @@ body {
 
 .pad-tiempos .tiempo-restante {
   text-align: right;
+  position: relative;
+  isolation: isolate;
+  --angulo-restante: 360deg;
+}
+
+.pad-tiempos .tiempo-restante::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background: conic-gradient(
+    var(--pad-color-borde) 0deg var(--angulo-restante),
+    rgba(255, 255, 255, 0.04) var(--angulo-restante) 360deg
+  );
+  opacity: 0.85;
+  z-index: 0;
 }
 
 .pad.reproduciendo .pad-tiempos {

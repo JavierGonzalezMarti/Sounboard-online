@@ -94,6 +94,17 @@ const aplicarColoresPad = (elemento, pad) => {
   elemento.style.setProperty("--pad-text-muted-off", "rgba(247, 247, 251, 0.78)");
 };
 
+const calcularAnguloRestante = (tiempoRestante, duracionTotal) => {
+  if (!duracionTotal || !Number.isFinite(duracionTotal)) return "0deg";
+  const restante = Math.max(0, Math.min(1, tiempoRestante / duracionTotal));
+  return `${restante * 360}deg`;
+};
+
+const aplicarProgresoCircular = (elemento, tiempoRestante, duracionTotal) => {
+  if (!elemento) return;
+  elemento.style.setProperty("--angulo-restante", calcularAnguloRestante(tiempoRestante, duracionTotal));
+};
+
 const limpiarExtensionesEstado = (estado) => ({
   ...estado,
   pestañas: estado.pestañas.map((pestana) => ({
@@ -339,6 +350,11 @@ const crearPadElemento = (pad) => {
     ? `-${formatearTiempo(pad.reproduccion.tiempoRestante)}`
     : "-00:00";
   tiempoRestante.textContent = textoRestante;
+  aplicarProgresoCircular(
+    tiempoRestante,
+    pad.reproduccion.tiempoRestante || 0,
+    pad.reproduccion.duracionTotal || 0
+  );
   const indicadorOnda = document.createElement("div");
   indicadorOnda.className = "indicador-onda";
   indicadorOnda.innerHTML = "<span></span><span></span><span></span>";
@@ -467,6 +483,7 @@ const actualizarTiempoEnUI = (idPad, tiempoRestante, duracionTotal) => {
   const etiquetaTotal = contenedor.querySelector(".tiempo-total");
   if (etiquetaRestante) {
     etiquetaRestante.textContent = `-${formatearTiempo(tiempoRestante)}`;
+    aplicarProgresoCircular(etiquetaRestante, tiempoRestante, duracionTotal);
   }
   if (etiquetaTotal && Number.isFinite(duracionTotal)) {
     etiquetaTotal.textContent = formatearTiempo(duracionTotal);
