@@ -210,7 +210,7 @@ body {
 
 .grid-pads {
   display: grid;
-  grid-template-columns: repeat(var(--numero-columnas), minmax(180px, 1fr));
+  grid-template-columns: repeat(var(--numero-columnas), minmax(220px, 1fr));
   gap: 16px;
   margin-top: 8px;
 }
@@ -239,6 +239,7 @@ body {
   border-radius: 18px;
   padding: 12px;
   min-height: 200px;
+  min-width: 220px;
   border: 2px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
@@ -414,22 +415,45 @@ body {
 
 .pad-tiempos .tiempo-restante {
   text-align: right;
-  position: relative;
-  isolation: isolate;
-  --angulo-restante: 360deg;
 }
 
-.pad-tiempos .tiempo-restante::before {
+.tiempo-restante-contenedor {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px;
+  align-items: center;
+}
+
+.tiempo-restante-contenedor .indicador-onda {
+  height: 24px;
+  width: 24px;
+  min-width: 24px;
+  border-radius: 999px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  display: none;
+  margin: 0;
+}
+
+.pad.reproduciendo .tiempo-restante-contenedor .indicador-onda {
+  display: inline-flex;
+}
+
+.tiempo-restante-contenedor .indicador-onda::after {
   content: "";
   position: absolute;
-  inset: -6px;
+  inset: 0;
   border-radius: 999px;
   background: conic-gradient(
-    var(--pad-color-borde) 0deg var(--angulo-restante),
-    rgba(255, 255, 255, 0.04) var(--angulo-restante) 360deg
+    var(--pad-color-borde) 0deg var(--angulo-restante, 360deg),
+    rgba(255, 255, 255, 0.08) var(--angulo-restante, 360deg) 360deg
   );
-  opacity: 0.85;
-  z-index: 0;
+  opacity: 0.9;
+}
+
+.tiempo-restante-contenedor .indicador-onda span {
+  height: 12px;
 }
 
 .pad.reproduciendo .pad-tiempos {
@@ -443,12 +467,10 @@ body {
 
 .indicador-onda {
   display: none;
-  gap: 6px;
-  align-items: flex-end;
+  gap: 5px;
+  align-items: center;
   height: 16px;
   pointer-events: none;
-  padding: 0 4px;
-  margin: 0 auto;
 }
 
 .pad.reproduciendo .indicador-onda {
@@ -573,7 +595,7 @@ body {
 
 @media (max-width: 960px) {
   .grid-pads {
-    grid-template-columns: repeat(var(--numero-columnas), minmax(150px, 1fr));
+    grid-template-columns: repeat(var(--numero-columnas), minmax(180px, 1fr));
   }
 }
 
@@ -588,6 +610,6 @@ body {
   }
 
   .grid-pads {
-    grid-template-columns: repeat(var(--numero-columnas), minmax(130px, 1fr));
+    grid-template-columns: repeat(var(--numero-columnas), minmax(160px, 1fr));
   }
 }

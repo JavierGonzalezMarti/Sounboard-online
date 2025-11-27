@@ -358,7 +358,10 @@ const crearPadElemento = (pad) => {
   const indicadorOnda = document.createElement("div");
   indicadorOnda.className = "indicador-onda";
   indicadorOnda.innerHTML = "<span></span><span></span><span></span>";
-  tiempos.append(tiempoTotal, indicadorOnda, tiempoRestante);
+  const contenedorRestante = document.createElement("div");
+  contenedorRestante.className = "tiempo-restante-contenedor";
+  contenedorRestante.append(indicadorOnda, tiempoRestante);
+  tiempos.append(tiempoTotal, contenedorRestante);
   contenedor.appendChild(tiempos);
 
   contenedor.addEventListener("click", () => manejarClickPad(pad.idPad));

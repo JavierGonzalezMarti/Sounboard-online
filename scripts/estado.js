@@ -2,6 +2,7 @@
 // Todo el código mantiene nombres en español y evita efectos secundarios para poder probar con facilidad.
 
 const paletaColores = [
+  "#fef3c7",
   "#fde047",
   "#facc15",
   "#fcd34d",
@@ -17,10 +18,12 @@ const paletaColores = [
   "#15803d",
   "#34d399",
   "#10b981",
+  "#bbf7d0",
   "#2dd4bf",
   "#14b8a6",
   "#22d3ee",
   "#67e8f9",
+  "#e0f2fe",
   "#0ea5e9",
   "#38bdf8",
   "#3b82f6",
@@ -32,6 +35,7 @@ const paletaColores = [
   "#8b5cf6",
   "#a855f7",
   "#c084fc",
+  "#f5d0fe",
   "#7c3aed",
   "#d946ef",
   "#ec4899",
