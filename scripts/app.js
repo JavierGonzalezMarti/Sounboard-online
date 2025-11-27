@@ -55,6 +55,43 @@ const volumenDucking = 0.35;
 const saltoScrollPestanas = 150;
 const umbralFinReproduccion = 0.12;
 
+const limpiarExtensionNombre = (nombre) => {
+  if (!nombre) return "";
+  const ultimoPunto = nombre.lastIndexOf(".");
+  if (ultimoPunto <= 0) return nombre;
+  return nombre.slice(0, ultimoPunto);
+};
+
+const hexAComponentesRgb = (colorHex) => {
+  if (!colorHex) return { r: 68, g: 82, b: 110 };
+  const limpio = colorHex.replace("#", "");
+  if (limpio.length < 6) return { r: 68, g: 82, b: 110 };
+  const r = parseInt(limpio.substring(0, 2), 16);
+  const g = parseInt(limpio.substring(2, 4), 16);
+  const b = parseInt(limpio.substring(4, 6), 16);
+  return { r, g, b };
+};
+
+const aplicarColoresPad = (elemento, pad) => {
+  const { r, g, b } = hexAComponentesRgb(pad.colorBase);
+  elemento.style.setProperty("--pad-color-rgb", `${r} ${g} ${b}`);
+  elemento.style.setProperty("--pad-color-base", pad.colorBase);
+  elemento.style.setProperty("--pad-color-borde", pad.colorBorde);
+};
+
+const limpiarExtensionesEstado = (estado) => ({
+  ...estado,
+  pestañas: estado.pestañas.map((pestana) => ({
+    ...pestana,
+    pads: pestana.pads.map((pad) => ({
+      ...pad,
+      nombreArchivo: limpiarExtensionNombre(pad.nombreArchivo)
+    }))
+  }))
+});
+
+estadoAplicacion = limpiarExtensionesEstado(estadoAplicacion);
+
 const asegurarEstadoValido = () => {
   // Garantiza que exista al menos una pestaña activa visible.
   if (!estadoAplicacion.pestañas || estadoAplicacion.pestañas.length === 0) {
@@ -208,15 +245,17 @@ const crearPadElemento = (pad) => {
   const contenedor = document.createElement("div");
   contenedor.className = "pad";
   contenedor.dataset.padId = pad.idPad;
-  contenedor.style.background = pad.colorBase;
-  contenedor.style.borderColor = pad.reproduccion.reproduciendo ? pad.colorBorde : "transparent";
-  if (pad.reproduccion.reproduciendo) {
-    contenedor.classList.add("reproduciendo");
-  }
+  aplicarColoresPad(contenedor, pad);
+  contenedor.classList.toggle("reproduciendo", pad.reproduccion.reproduciendo);
 
   const selectorColores = document.createElement("div");
   selectorColores.className = "selector-colores";
   contenedor.appendChild(selectorColores);
+
+  const indicadorOnda = document.createElement("div");
+  indicadorOnda.className = "indicador-onda";
+  indicadorOnda.innerHTML = "<span></span><span></span><span></span>";
+  contenedor.appendChild(indicadorOnda);
 
   const controles = document.createElement("div");
   controles.className = "pad-controles";
@@ -274,7 +313,8 @@ const crearPadElemento = (pad) => {
 
   const nombre = document.createElement("div");
   nombre.className = `pad-nombre ${pad.archivo ? "" : "vacio"}`;
-  nombre.textContent = pad.nombreArchivo;
+  const nombreVisible = limpiarExtensionNombre(pad.nombreArchivo) || "Vacío";
+  nombre.textContent = nombreVisible;
   contenedor.appendChild(nombre);
 
   const tiempos = document.createElement("div");
@@ -556,7 +596,7 @@ const asignarArchivoAPad = async (idPad, archivo) => {
     await guardarAudioEnIndexedDB(idPad, archivo);
     const cambios = {
       archivo: { nombre: archivo.name, tipo: archivo.type },
-      nombreArchivo: archivo.name,
+      nombreArchivo: limpiarExtensionNombre(archivo.name),
       reproduccion: { duracionTotal: duracion, tiempoRestante: duracion, reproduciendo: false },
       necesitaRecarga: false
     };

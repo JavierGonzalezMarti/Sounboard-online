@@ -212,27 +212,81 @@ body {
 }
 
 .pad {
+  --pad-color-base: var(--relleno-pad);
+  --pad-color-rgb: 34 38 58;
+  --pad-color-borde: #6cf0c2;
   position: relative;
-  background: var(--relleno-pad);
+  overflow: hidden;
+  background: linear-gradient(
+      150deg,
+      rgb(var(--pad-color-rgb) / 0.14),
+      rgb(var(--pad-color-rgb) / 0.08) 45%,
+      #0c0e14 100%
+    ),
+    var(--fondo);
   border-radius: 18px;
   padding: 12px;
   min-height: 200px;
-  border: 2px solid transparent;
+  border: 2px solid rgb(var(--pad-color-rgb) / 0.22);
   display: flex;
   flex-direction: column;
   gap: 16px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-  transition: border-color var(--duracion-transicion), transform var(--duracion-transicion), box-shadow var(--duracion-transicion);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition:
+    border-color var(--duracion-transicion),
+    transform var(--duracion-transicion),
+    box-shadow var(--duracion-transicion),
+    background var(--duracion-transicion),
+    filter var(--duracion-transicion);
   cursor: pointer;
+}
+
+.pad::before {
+  content: "";
+  position: absolute;
+  inset: -24%;
+  background: radial-gradient(circle at 30% 30%, rgb(var(--pad-color-rgb) / 0.24), transparent 55%);
+  opacity: 0.35;
+  transition: opacity var(--duracion-transicion), filter var(--duracion-transicion), transform var(--duracion-transicion);
+}
+
+.pad > * {
+  position: relative;
+  z-index: 1;
 }
 
 .pad:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.32);
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.pad:not(.reproduciendo) {
+  filter: saturate(0.65) brightness(0.9);
 }
 
 .pad.reproduciendo {
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+  background: linear-gradient(
+    140deg,
+    rgb(var(--pad-color-rgb) / 0.9),
+    rgb(var(--pad-color-rgb) / 0.55) 55%,
+    #0b0f19 100%
+  );
+  border-color: var(--pad-color-borde);
+  box-shadow:
+    0 0 0 4px rgb(var(--pad-color-rgb) / 0.35),
+    0 16px 40px rgb(var(--pad-color-rgb) / 0.32),
+    0 12px 30px rgba(0, 0, 0, 0.5);
+  filter: saturate(1) brightness(1.05);
+}
+
+.pad.reproduciendo::before {
+  opacity: 0.9;
+  filter: blur(18px);
+  transform: scale(1.05);
 }
 
 .pad-controles {
@@ -250,6 +304,12 @@ body {
   padding: 8px 6px;
   cursor: pointer;
   transition: background var(--duracion-transicion), border-color var(--duracion-transicion), transform var(--duracion-transicion);
+}
+
+.pad.reproduciendo .pad-icono {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #0b0f19;
 }
 
 .pad-icono.activo {
@@ -271,11 +331,19 @@ body {
   font-weight: 700;
   color: #f0f1f8;
   letter-spacing: 0.3px;
+  transition: color var(--duracion-transicion), text-shadow var(--duracion-transicion);
 }
 
 .pad-nombre.vacio {
   color: var(--muted);
   font-weight: 600;
+}
+
+.pad.reproduciendo .pad-nombre {
+  color: #0b0f19;
+  text-shadow:
+    0 8px 26px rgba(0, 0, 0, 0.35),
+    0 0 18px rgb(var(--pad-color-rgb) / 0.5);
 }
 
 .pad-tiempos {
@@ -286,9 +354,68 @@ body {
   color: #d7d9e7;
 }
 
+.pad.reproduciendo .pad-tiempos {
+  color: #0b0f19;
+}
+
 .pad-tiempos small {
   color: var(--muted);
   font-weight: 500;
+}
+
+.pad.reproduciendo .pad-tiempos small {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.indicador-onda {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: none;
+  gap: 6px;
+  align-items: flex-end;
+  height: 22px;
+  pointer-events: none;
+}
+
+.pad.reproduciendo .indicador-onda {
+  display: inline-flex;
+}
+
+.indicador-onda span {
+  width: 5px;
+  height: 10px;
+  background: rgb(var(--pad-color-rgb) / 0.75);
+  border-radius: 999px;
+  animation: onda 1s ease-in-out infinite;
+  box-shadow: 0 0 12px rgb(var(--pad-color-rgb) / 0.7);
+}
+
+.indicador-onda span:nth-child(2) {
+  animation-delay: 0.15s;
+  height: 14px;
+}
+
+.indicador-onda span:nth-child(3) {
+  animation-delay: 0.3s;
+  height: 11px;
+}
+
+.pad.reproduciendo .indicador-onda span {
+  background: var(--pad-color-borde);
+  box-shadow: 0 0 14px var(--pad-color-borde);
+}
+
+@keyframes onda {
+  0%,
+  100% {
+    transform: scaleY(0.6);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scaleY(1.35);
+    opacity: 1;
+  }
 }
 
 .selector-colores {
