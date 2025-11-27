@@ -4,6 +4,24 @@ const claveEstado = "soundboard-estado";
 const nombreBaseDatos = "soundboard-audios";
 const nombreStore = "audios";
 
+const bufferABase64 = (buffer) => {
+  const bytes = new Uint8Array(buffer);
+  let binario = "";
+  bytes.forEach((b) => {
+    binario += String.fromCharCode(b);
+  });
+  return btoa(binario);
+};
+
+const base64ABuffer = (cadena) => {
+  const binario = atob(cadena);
+  const bytes = new Uint8Array(binario.length);
+  for (let i = 0; i < binario.length; i += 1) {
+    bytes[i] = binario.charCodeAt(i);
+  }
+  return bytes.buffer;
+};
+
 const guardarEstadoLocal = (estado) => {
   const estadoSerializable = JSON.stringify(estado);
   localStorage.setItem(claveEstado, estadoSerializable);
@@ -42,16 +60,20 @@ const leerArchivoComoBuffer = (archivo) =>
   });
 
 const guardarAudioEnIndexedDB = async (idPad, archivo) => {
-  const baseDatos = await abrirBaseDatos();
   const buffer = await leerArchivoComoBuffer(archivo);
+  await guardarAudioBufferEnIndexedDB(idPad, buffer, archivo.type, archivo.name);
+};
+
+const guardarAudioBufferEnIndexedDB = async (idPad, buffer, tipo, nombre) => {
+  const baseDatos = await abrirBaseDatos();
   await new Promise((resolver, rechazar) => {
     const transaccion = baseDatos.transaction(nombreStore, "readwrite");
     const store = transaccion.objectStore(nombreStore);
     store.put({
       idPad,
       buffer,
-      tipo: archivo.type,
-      nombre: archivo.name
+      tipo,
+      nombre
     });
     transaccion.oncomplete = () => resolver();
     transaccion.onerror = () => rechazar(transaccion.error);
@@ -99,11 +121,30 @@ const limpiarAudios = async () => {
   });
 };
 
-const descargarArchivoConfiguracion = (estado) => {
+const descargarArchivoConfiguracion = async (estado) => {
+  const ids = Array.from(
+    new Set(estado.pestañas.flatMap((pestana) => pestana.pads.map((pad) => pad.idPad)))
+  );
+
+  const audios = await Promise.all(ids.map((idPad) => cargarAudioDeIndexedDB(idPad)));
+  const audiosExportables = await Promise.all(
+    audios.map(async (audio, indice) => {
+      if (!audio?.blob) return null;
+      const buffer = await audio.blob.arrayBuffer();
+      return {
+        idPad: ids[indice],
+        tipo: audio.blob.type,
+        nombre: audio.nombre || audio.blob.name,
+        base64: bufferABase64(buffer)
+      };
+    })
+  );
+
   const payload = {
-    version: 1,
+    version: 2,
     creadoEn: new Date().toISOString(),
-    estado
+    estado,
+    audios: audiosExportables.filter(Boolean)
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: "application/json"
@@ -116,10 +157,21 @@ const descargarArchivoConfiguracion = (estado) => {
   URL.revokeObjectURL(url);
 };
 
+const guardarAudiosImportados = async (audios = []) => {
+  if (!Array.isArray(audios)) return;
+  for (const audio of audios) {
+    if (!audio?.base64 || !audio?.idPad) continue;
+    const buffer = base64ABuffer(audio.base64);
+    const tipo = audio.tipo || "audio/wav";
+    const nombre = audio.nombre || "audio";
+    await guardarAudioBufferEnIndexedDB(audio.idPad, buffer, tipo, nombre);
+  }
+};
+
 const leerArchivoConfiguracion = async (archivo) => {
   const contenido = await archivo.text();
   const datos = JSON.parse(contenido);
-  return datos.estado;
+  return { estado: datos.estado, audios: datos.audios || [] };
 };
 
 export {
@@ -128,6 +180,8 @@ export {
   descargarArchivoConfiguracion,
   eliminarAudioDeIndexedDB,
   guardarAudioEnIndexedDB,
+  guardarAudioBufferEnIndexedDB,
+  guardarAudiosImportados,
   guardarEstadoLocal,
   leerArchivoConfiguracion,
   limpiarAudios

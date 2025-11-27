@@ -22,6 +22,7 @@ import {
   descargarArchivoConfiguracion,
   eliminarAudioDeIndexedDB,
   guardarAudioEnIndexedDB,
+  guardarAudiosImportados,
   guardarEstadoLocal,
   leerArchivoConfiguracion,
   limpiarAudios
@@ -469,6 +470,20 @@ const actualizarTiempoEnUI = (idPad, tiempoRestante, duracionTotal) => {
   }
 };
 
+const detenerTodosLosPads = async () => {
+  temporizadores.forEach((intervalo) => clearInterval(intervalo));
+  temporizadores.clear();
+  const pads = estadoAplicacion.pestañas.flatMap((p) => p.pads);
+  await Promise.all(
+    pads.map((pad) =>
+      detenerAudio(pad.idPad, {
+        reinicioActivo: true,
+        fadeOutActivo: pad.opciones.fadeOutActivo
+      })
+    )
+  );
+};
+
 const recalcularDucking = () => {
   // Reduce el volumen de los pads con ducking cuando otro pad está sonando.
   const padsReproduciendo = estadoAplicacion.pestañas
@@ -670,16 +685,18 @@ const configurarEventos = () => {
     guardarYRenderizar();
   });
 
-  botonGuardar.addEventListener("click", () => {
-    descargarArchivoConfiguracion(estadoAplicacion);
+  botonGuardar.addEventListener("click", async () => {
+    await descargarArchivoConfiguracion(estadoAplicacion);
   });
 
   cargadorArchivo.addEventListener("change", async (evento) => {
     const archivo = evento.target.files?.[0];
     if (!archivo) return;
     try {
-      const estado = await leerArchivoConfiguracion(archivo);
+      const { estado, audios } = await leerArchivoConfiguracion(archivo);
+      await detenerTodosLosPads();
       await limpiarAudios();
+      await guardarAudiosImportados(audios);
       estadoAplicacion = limpiarExtensionesEstado(estado);
       asegurarEstadoValido();
       await restaurarAudios();
@@ -693,6 +710,7 @@ const configurarEventos = () => {
   botonReiniciar.addEventListener("click", async () => {
     const confirmar = confirm("Esto limpiará todas las pestañas y audios. ¿Continuar?");
     if (!confirmar) return;
+    await detenerTodosLosPads();
     await limpiarAudios();
     estadoAplicacion = crearEstadoInicial();
     asegurarEstadoValido();
