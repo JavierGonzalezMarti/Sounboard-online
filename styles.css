@@ -440,6 +440,7 @@ body {
 
 .pad-tiempos .tiempo-restante {
   text-align: right;
+  justify-self: end;
 }
 
 .pad.reproduciendo .pad-tiempos {
