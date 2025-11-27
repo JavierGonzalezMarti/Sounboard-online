@@ -72,11 +72,23 @@ const hexAComponentesRgb = (colorHex) => {
   return { r, g, b };
 };
 
+const colorTextoContraste = (colorHex) => {
+  const { r, g, b } = hexAComponentesRgb(colorHex);
+  const brillo = 0.299 * r + 0.587 * g + 0.114 * b;
+  const textoPrincipal = brillo > 160 ? "#0b0f19" : "#f7f7fb";
+  const textoSuave =
+    brillo > 160 ? "rgba(0, 0, 0, 0.7)" : "rgba(247, 247, 251, 0.78)";
+  return { textoPrincipal, textoSuave };
+};
+
 const aplicarColoresPad = (elemento, pad) => {
   const { r, g, b } = hexAComponentesRgb(pad.colorBase);
+  const { textoPrincipal, textoSuave } = colorTextoContraste(pad.colorBase);
   elemento.style.setProperty("--pad-color-rgb", `${r} ${g} ${b}`);
   elemento.style.setProperty("--pad-color-base", pad.colorBase);
   elemento.style.setProperty("--pad-color-borde", pad.colorBorde);
+  elemento.style.setProperty("--pad-text-color", textoPrincipal);
+  elemento.style.setProperty("--pad-text-muted", textoSuave);
 };
 
 const limpiarExtensionesEstado = (estado) => ({
@@ -252,11 +264,6 @@ const crearPadElemento = (pad) => {
   selectorColores.className = "selector-colores";
   contenedor.appendChild(selectorColores);
 
-  const indicadorOnda = document.createElement("div");
-  indicadorOnda.className = "indicador-onda";
-  indicadorOnda.innerHTML = "<span></span><span></span><span></span>";
-  contenedor.appendChild(indicadorOnda);
-
   const controles = document.createElement("div");
   controles.className = "pad-controles";
   const botonDucking = crearBotonIcono("🦆", pad.opciones.duckingActivo, "Ducking activo");
@@ -328,7 +335,10 @@ const crearPadElemento = (pad) => {
     ? `-${formatearTiempo(pad.reproduccion.tiempoRestante)}`
     : "-00:00";
   tiempoRestante.textContent = textoRestante;
-  tiempos.append(tiempoTotal, tiempoRestante);
+  const indicadorOnda = document.createElement("div");
+  indicadorOnda.className = "indicador-onda";
+  indicadorOnda.innerHTML = "<span></span><span></span><span></span>";
+  tiempos.append(tiempoTotal, indicadorOnda, tiempoRestante);
   contenedor.appendChild(tiempos);
 
   contenedor.addEventListener("click", () => manejarClickPad(pad.idPad));

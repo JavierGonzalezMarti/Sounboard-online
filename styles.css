@@ -215,19 +215,18 @@ body {
   --pad-color-base: var(--relleno-pad);
   --pad-color-rgb: 34 38 58;
   --pad-color-borde: #6cf0c2;
+  --pad-text-color: #f7f7fb;
+  --pad-text-muted: rgba(247, 247, 251, 0.78);
   position: relative;
   overflow: hidden;
-  background: linear-gradient(
-      150deg,
-      rgb(var(--pad-color-rgb) / 0.14),
-      rgb(var(--pad-color-rgb) / 0.08) 45%,
-      #0c0e14 100%
-    ),
-    var(--fondo);
+  background:
+    radial-gradient(circle at 18% 22%, rgb(var(--pad-color-rgb) / 0.12), transparent 38%),
+    radial-gradient(circle at 82% 78%, rgb(var(--pad-color-rgb) / 0.08), transparent 45%),
+    linear-gradient(160deg, #111423, #0c0e18 55%, #090b14);
   border-radius: 18px;
   padding: 12px;
   min-height: 200px;
-  border: 2px solid rgb(var(--pad-color-rgb) / 0.22);
+  border: 2px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -264,20 +263,23 @@ body {
 }
 
 .pad:not(.reproduciendo) {
-  filter: saturate(0.65) brightness(0.9);
+  filter: saturate(0.55) brightness(0.94);
 }
 
 .pad.reproduciendo {
-  background: linear-gradient(
-    140deg,
-    rgb(var(--pad-color-rgb) / 0.9),
-    rgb(var(--pad-color-rgb) / 0.55) 55%,
-    #0b0f19 100%
-  );
+  background:
+    radial-gradient(circle at 18% 22%, rgb(var(--pad-color-rgb) / 0.48), transparent 35%),
+    radial-gradient(circle at 82% 78%, rgb(var(--pad-color-rgb) / 0.32), transparent 50%),
+    linear-gradient(
+      135deg,
+      rgb(var(--pad-color-rgb) / 0.92),
+      rgb(var(--pad-color-rgb) / 0.65) 50%,
+      rgb(var(--pad-color-rgb) / 0.35)
+    );
   border-color: var(--pad-color-borde);
   box-shadow:
-    0 0 0 4px rgb(var(--pad-color-rgb) / 0.35),
-    0 16px 40px rgb(var(--pad-color-rgb) / 0.32),
+    0 0 0 5px rgb(var(--pad-color-rgb) / 0.32),
+    0 16px 40px rgb(var(--pad-color-rgb) / 0.38),
     0 12px 30px rgba(0, 0, 0, 0.5);
   filter: saturate(1) brightness(1.05);
 }
@@ -286,6 +288,16 @@ body {
   opacity: 0.9;
   filter: blur(18px);
   transform: scale(1.05);
+}
+
+.pad.reproduciendo::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 14px;
+  border: 2px solid rgb(var(--pad-color-rgb) / 0.32);
+  box-shadow: inset 0 0 28px rgb(var(--pad-color-rgb) / 0.2);
+  pointer-events: none;
 }
 
 .pad-controles {
@@ -308,7 +320,7 @@ body {
 .pad.reproduciendo .pad-icono {
   background: rgba(255, 255, 255, 0.16);
   border-color: rgba(255, 255, 255, 0.28);
-  color: #0b0f19;
+  color: var(--pad-text-color);
 }
 
 .pad-icono.activo {
@@ -328,18 +340,17 @@ body {
   text-align: center;
   font-size: 18px;
   font-weight: 700;
-  color: #f0f1f8;
+  color: var(--pad-text-color);
   letter-spacing: 0.3px;
   transition: color var(--duracion-transicion), text-shadow var(--duracion-transicion);
 }
 
 .pad-nombre.vacio {
-  color: var(--muted);
+  color: var(--pad-text-muted);
   font-weight: 600;
 }
 
 .pad.reproduciendo .pad-nombre {
-  color: #0b0f19;
   text-shadow:
     0 8px 26px rgba(0, 0, 0, 0.35),
     0 0 18px rgb(var(--pad-color-rgb) / 0.5);
@@ -350,32 +361,26 @@ body {
   align-items: center;
   justify-content: space-between;
   font-weight: 600;
-  color: #d7d9e7;
+  color: var(--pad-text-color);
+  gap: 10px;
 }
 
 .pad.reproduciendo .pad-tiempos {
-  color: #0b0f19;
+  color: var(--pad-text-color);
 }
 
 .pad-tiempos small {
-  color: var(--muted);
+  color: var(--pad-text-muted);
   font-weight: 500;
 }
 
-.pad.reproduciendo .pad-tiempos small {
-  color: rgba(0, 0, 0, 0.65);
-}
-
 .indicador-onda {
-  position: absolute;
-  top: 12px;
-  left: 12px;
   display: none;
   gap: 6px;
   align-items: flex-end;
-  height: 22px;
+  height: 18px;
   pointer-events: none;
-  z-index: 1;
+  padding: 0 4px;
 }
 
 .pad.reproduciendo .indicador-onda {
