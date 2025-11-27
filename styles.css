@@ -368,12 +368,13 @@ body {
 }
 
 .pad-tiempos {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   font-weight: 600;
   color: var(--pad-text-color);
   gap: 8px;
+  width: 100%;
 }
 
 .pad-tiempos span {
@@ -407,6 +408,7 @@ body {
   height: 16px;
   pointer-events: none;
   padding: 0 4px;
+  margin: 0 auto;
 }
 
 .pad.reproduciendo .indicador-onda {
